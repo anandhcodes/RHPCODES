@@ -1,0 +1,220 @@
+import java.io.*;
+import java.util.*;
+class Sofa {
+
+int fsr, fsc, ssr, ssc;
+char dir;
+int moves;
+
+public Sofa(int fsr, int fsc, int ssr, int ssc, char d, int m) {
+this.fsr = fsr;
+this.fsc = fsc;
+this.ssr = ssr;
+this.ssc = ssc;
+this.dir = d;
+this.moves = m;
+}
+class Main{
+	public static void main(String[] args){
+		int r=sc.nextInt();
+		int c=sc.nextInt();
+		sc.nextLine();
+		char arr[]=new char[r][c];
+		int fsr, fsc, ssr, ssc,sofacount=0;
+		fsr, fsc, ssr, ssc=-1;
+		Queue<String> q=new LinkedList<>();
+		for(int i=0;i<r;i++){
+			for(int j=0;j<c;j++){
+				arr[i][j]=sc.next().charAt(0);
+				if(arr[i][j]=='s'){
+					sofacount++;
+					if(sofacount==1){
+						fsr=i;
+						ssr=j;
+					}else{
+						ssr=i;
+						ssc=j;
+					}
+					Sofa s=new Sofa(fsr,fsc,ssr,ssc,(fsr==ssr)?'H':'V',0);
+					q.add(s);
+				}
+			}
+		}
+		Set<String> vis=new HashSet<>();
+		while(!q.isEmpty()){
+			Sofa s=q.poll();
+			if(arr[s.fsr][s.fsc]=='S' && arr[s.ssr][s.ssc]=='S'){
+				System.out.println(s.moves);return;
+			}
+			if(s.dir=='H'){
+				//drag right
+				if(s.ssr<r-1 && arr[s.ssr][s.ssc+1]!='H'){
+					if(canAdd(s.fsr,s.fsc,s.ssr.s.ssc+1,vis))
+					q.add(new Sofa(s.fsr,s.fsc,s.ssr,s.ssc+1,'H',s.moves+1));
+				}
+				//drag left
+				if(s.fsr>0 && arr[s.fsr-1][s.fsc]!='H'){
+					if(canAdd(s.fsr-1,s.fsc,s.ssr,s.ssc,vis)){
+						q.add(new Sofa(s.fsr-1,s.fsc,s.ssr,s.ssc,'H',s.moves+1));
+					}
+				}
+				//drag up
+				if(fsc>0 && arr[s.fsr-1][s.fsc]!='H' && arr[s.ssr-1][s.ssc]!='H' ){
+					if(canAdd(s.fsr-1,s.fsc,s.ssr-1,s.ssc,vis)){
+						q.add(new Sofa(s.fsr-1,s.fsc,s.ssr-1,s.ssc,'H',s.moves+1));
+					}
+				}
+				//drag down
+				if(fsc>r-1 && arr[s.fsr+1][s.fsc]!='H' && arr[s.ssr+1][s.ssc]!='H'){
+					if(canAdd(s.fsr+1,s.fsc,s.ssr+1,s.ssc,vis)){
+						q.add(new Sofa(s.fsr+1,s.fsc,s.ssr+1,s.ssc,'H',s.moves+1));
+					}
+				}
+				
+                // Rotation 
+                if (s.fsc < c - 1 && s.fsr > 0 && arr[s.fsr - 1][s.fsc] != 'H' 
+                && arr[s.fsr - 1][s.fsc + 1] != 'H'
+                        && arr[s.fsr][s.fsc + 1] != 'H') {
+
+                    if (canAdd(s.fsr - 1, s.fsc,s.fsr, s.fsc, vis)) {
+                               
+                        q.add(new Sofa(s.fsr - 1, s.fsc,s.fsr, s.fsc, 'V',s.moves + 1));                
+                    }
+
+                    if (canAdd(s.fsr - 1, s.fsc + 1,s.fsr, s.fsc + 1, vis)) {
+                        q.add(new Sofa(s.fsr - 1, s.fsc + 1,s.fsr, s.fsc + 1, 'V',s.moves + 1));
+                    }
+                }
+
+                // Rotation 
+                if (s.fsc < c - 1 && s.ssr < r - 1 && arr[s.fsr][s.fsc] != 'H'&& arr[s.fsr + 1][s.fsc] != 'H'   && arr[s.fsr + 1][s.fsc + 1] != 'H') {
+                       
+                        
+                      
+
+                    if (canAdd(s.fsr, s.fsc,
+                               s.fsr + 1, s.fsc, vis)) {
+                        q.add(new Sofa(s.fsr, s.fsc,
+                                       s.fsr + 1, s.fsc, 'V',
+                                       s.moves + 1));
+                    }
+
+                    if (canAdd(s.fsr, s.fsc + 1,
+                               s.fsr + 1, s.fsc + 1, vis)) {
+                        q.add(new Sofa(s.fsr, s.fsc + 1,
+                                       s.fsr + 1, s.fsc + 1, 'V',
+                                       s.moves + 1));
+                    }
+                }
+			}else{
+				
+                // drag right
+                if (s.fsc < c - 1
+                        && arr[s.fsr][s.fsc + 1] != 'H'
+                        && arr[s.ssr][s.ssc + 1] != 'H') {
+
+                    if (canAdd(s.fsr, s.fsc + 1,
+                               s.ssr, s.ssc + 1, vis)) {
+
+                        q.add(new Sofa(s.fsr, s.fsc + 1,
+                                       s.ssr, s.ssc + 1,
+                                       'V', s.moves + 1));
+                    }
+                }
+
+                // drag left
+                if (s.fsc > 0
+                        && arr[s.fsr][s.fsc - 1] != 'H'
+                        && arr[s.ssr][s.ssc - 1] != 'H') {
+
+                    if (canAdd(s.fsr, s.fsc - 1,
+                               s.ssr, s.ssc - 1, vis)) {
+
+                        q.add(new Sofa(s.fsr, s.fsc - 1,
+                                       s.ssr, s.ssc - 1,
+                                       'V', s.moves + 1));
+                    }
+                }
+
+                // drag up
+                if (s.fsr > 0 && arr[s.fsr - 1][s.fsc] != 'H') {
+
+                    if (canAdd(s.fsr - 1, s.fsc,
+                               s.ssr - 1, s.ssc, vis)) {
+
+                        q.add(new Sofa(s.fsr - 1, s.fsc,
+                                       s.ssr - 1, s.ssc,
+                                       'V', s.moves + 1));
+                    }
+                }
+
+                // drag down
+                if (s.ssr < r - 1
+                        && arr[s.ssr + 1][s.ssc] != 'H') {
+
+                    if (canAdd(s.fsr + 1, s.fsc,
+                               s.ssr + 1, s.ssc, vis)) {
+
+                        q.add(new Sofa(s.fsr + 1, s.fsc,
+                                       s.ssr + 1, s.ssc,
+                                       'V', s.moves + 1));
+                    }
+                }
+                
+                // Rotation using the 2x2 square on the left
+                if (s.fsr < r - 1 && s.fsc > 0
+                        && arr[s.fsr][s.fsc - 1] != 'H'
+                        && arr[s.ssr][s.fsc - 1] != 'H'
+                        && arr[s.ssr][s.ssc] != 'H') {
+
+                    if (canAdd(s.fsr, s.fsc - 1,
+                               s.fsr, s.fsc, vis)) {
+                        q.add(new Sofa(s.fsr, s.fsc - 1,
+                                       s.fsr, s.fsc, 'H',
+                                       s.moves + 1));
+                    }
+
+                    if (canAdd(s.ssr, s.fsc - 1,
+                               s.ssr, s.fsc, vis)) {
+                        q.add(new Sofa(s.ssr, s.fsc - 1,
+                                       s.ssr, s.fsc, 'H',
+                                       s.moves + 1));
+                    }
+                }
+
+                // Rotation 
+                if (s.fsr < r - 1 && s.fsc < c - 1
+                        && arr[s.fsr][s.fsc + 1] != 'H'
+                        && arr[s.ssr][s.fsc + 1] != 'H'
+                        && arr[s.ssr][s.ssc] != 'H') {
+
+                    if (canAdd(s.fsr, s.fsc,
+                               s.fsr, s.fsc + 1, vis)) {
+                        q.add(new Sofa(s.fsr, s.fsc,
+                                       s.fsr, s.fsc + 1, 'H',
+                                       s.moves + 1));
+                    }
+
+                    if (canAdd(s.ssr, s.fsc,
+                               s.ssr, s.fsc + 1, vis)) {
+                        q.add(new Sofa(s.ssr, s.fsc,
+                                       s.ssr, s.fsc + 1, 'H',
+                                       s.moves + 1));
+                    }
+                }
+			}
+			System.out.println("Impossible");
+		}
+	}
+	static final String delim="-";
+	private static boolean canAdd(int fsr,int fsc,int ssr,int ssc,Set<String> vis){
+		StringBuilder sb=new StringBuilder();
+		sb.append(fsr).append(delim).append(fsc).append(delim).append(ssr).append(delim).append(ssc);
+		String k=sb.toString();
+		if(vis.contains(k)){
+			return false;
+		}
+		return true;
+	}
+}
+}
